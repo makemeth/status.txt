@@ -1,33 +1,32 @@
-name: Toggle True/False in Repository
+name: 🔄 Toggle Status API
 
 on:
-  workflow_dispatch: # Cho phép chạy thủ công
-  schedule:
-    - cron: '0 * * * *' # Chạy tự động mỗi giờ
+  workflow_dispatch:
+  repository_dispatch:
+    types: [toggle_status]
 
 jobs:
-  toggle-status:
+  toggle:
     runs-on: ubuntu-latest
     steps:
       - name: 📥 Clone repo
         uses: actions/checkout@v4
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.PAT_TOKEN }}
 
-      - name: 🔄 Đọc và đổi trạng thái
+      - name: 🔄 Toggle status
         run: |
-          FILE=status.txt
-          if [[ ! -f "$FILE" ]]; then echo "true" > "$FILE"; fi
-          OLD_VALUE=$(cat "$FILE")
-          NEW_VALUE="false"
-          if [[ "$OLD_VALUE" == "false" ]]; then NEW_VALUE="true"; fi
-          echo "$NEW_VALUE" > "$FILE"
-          echo "✅ Trạng thái mới: $NEW_VALUE"
+          if [[ $(cat status.txt) == "true" ]]; then
+            echo "false" > status.txt
+          else
+            echo "true" > status.txt
+          fi
+          echo "🔄 Toggled to $(cat status.txt)"
 
-      - name: 🚀 Commit và Push thay đổi
+      - name: 🚀 Commit & Push
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
           git add status.txt
-          git commit -m "🔄 Toggled status to $(cat status.txt)"
-          git push
+          git commit -m "🔄 Status changed to $(cat status.txt)" || true
+          git push || true
