@@ -12,7 +12,7 @@ jobs:
       - name: 📥 Clone repo
         uses: actions/checkout@v4
         with:
-          token: ${{ secrets.PAT_TOKEN }}
+          token: ${{ secrets.TOKEN }}
 
       - name: 🔄 Toggle status
         run: |
